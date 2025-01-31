@@ -1,15 +1,27 @@
-import quotes from "./data.js";
+const author = document.getElementById('author');
+const quote = document.getElementById('quote');
+const generateQuoteBtn = document.getElementById('generateNewQuote');
 
-const quoteTitle = document.getElementById("quote");
-const authorName = document.getElementById("author");
-const generateBtn = document.getElementById("generate-btn");
+const apiUrl = 'https://dummyjson.com/quotes';
+async function getQuote() {
+    try {
+        const response = await fetch(apiUrl);
+        const data = await response.json();
+        if(!data.quotes?.length) throw new Error("No quote found!");
+        displayQuotes(data.quotes);
+    } catch (error) {
+        console.error('Error fetching quote', error);
+        quote.textContent = 'Failed to load quote!';
+        author.textContent = '';
+    }
+};
 
-quoteTitle.innerHTML = quotes[0].text;
-authorName.innerHTML = quotes[0].author;
-
-generateBtn.addEventListener('click', function() {
+function displayQuotes(quotes) {
     const randomIndex = Math.floor(Math.random() * quotes.length);
-    const {text, author} = quotes[randomIndex];
-    quoteTitle.innerHTML = text;
-    authorName.innerHTML = author;
-});
+    const {quote: text, author: name} = quotes[randomIndex];    
+    quote.textContent = `${text}`;
+    author.textContent = `- ${name}`;
+}
+
+document.addEventListener('DOMContentLoaded', getQuote);
+generateQuoteBtn.addEventListener('click', getQuote);
